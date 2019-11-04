@@ -1,0 +1,110 @@
+#### ####
+# Author: Zach Bray
+# My bash prompt
+#### ####
+
+
+# function called every time the prompt needs to be rendered
+function prompt_command() {
+
+	# colors used in the prompt
+	local    RED="\[\033[0;31m\]"
+	local  GREEN="\[\033[0;32m\]"
+	local YELLOW="\[\033[0;33m\]"
+	local   BLUE="\[\033[0;34m\]"
+	local PURPLE="\[\033[0;35m\]"
+	local   CYAN="\[\033[0;36m\]"
+	local  RESET="\[\033[;0m\]"
+
+	local BRANCH
+	local BRANCH_COLOR=$GREEN
+	local COMMITS
+	local AHEAD
+	local BEHIND
+	local COMMITS_DIFF
+
+	# if a git repo, add repo info
+	if (git rev-parse --is-inside-work-tree &> /dev/null); then
+		
+		# returns current branch
+		BRANCH="$(git branch | sed -n 's/* //p')"
+
+		# returns how many commits behind or ahead the current branch is
+		COMMITS=$(git rev-list --left-right --count origin/$BRANCH...$BRANCH 2>&1)
+
+		# if a new branch, output a questionmark
+		if [[ $COMMITS =~ ^.*unknown\ revision.*$ ]] ; then
+			COMMITS_DIFF=" ?"
+			BRANCH_COLOR=$YELLOW
+		
+		# else it is a normal branch, so show commit dif
+		else
+			BEHIND=$(echo $COMMITS | cut -f1 -d ' ')
+			AHEAD=$(echo $COMMITS | cut -f2 -d ' ')
+
+			if [[ "$AHEAD" != "0" ]] ; then
+				COMMITS_DIFF=" +$AHEAD"
+				BRANCH_COLOR=$YELLOW
+			fi
+			if [[ "$BEHIND" != "0" ]] ; then
+				BRANCH_COLOR=$RED
+				COMMITS_DIFF+=" -$BEHIND"
+			fi
+		fi
+
+		# if branch is empty, that means it is a new repo with no branches
+		if [ -z $BRANCH ]; then
+			BRANCH="NO-BRANCH"
+			BRANCH_COLOR=$YELLOW
+
+		# check if files have changed
+		elif ! git diff-index --quiet HEAD ; then
+			BRANCH_COLOR=$RED
+		fi
+
+		BRANCH=" [$BRANCH$COMMITS_DIFF]"
+
+	fi
+
+	# only show '@host' if it's not my local machine
+	if [[ $LOCAL != 1 ]]; then
+		local HOST="$RED@$CYAN\h"
+		local HOST_PRMPT="@$HOSTNAME"
+	fi
+
+	# USER@HOST:DIRECTORY_HEAD [BRANCH] >
+	PS1="$CYAN\u$HOST$RED:$PURPLE\W$BRANCH_COLOR$BRANCH$RED > $RESET" 
+	export PS1
+
+
+	# ---- ---- ---- ---- PS2 ---- ---- ---- ---- #
+	# This part generates what the prompt would look like and then counts
+	# the length and creates a string of that many spaces. That way the 
+	# multiline prompt is the same length as the first line.
+
+	# gets current working directory and deals with some exceptions
+	local DIR="${PWD##*/}"
+	if [[ "$DIR" == "$USER" ]]; then
+		DIR="~"
+	elif [[ $DIR == "" ]]; then
+		DIR="/"
+	fi
+
+	# build the prompt string
+	local prompt="$USER$HOST_PRMPT:$DIR$BRANCH"
+	
+	# create string of length spaces
+	local spaces=""
+	for i in `seq 1 ${#prompt}`; do
+		spaces+=" "
+	done
+
+	# multiline commands are now same length as prompt
+	PS2="$spaces$RED >$RESET "
+	export PS2
+}
+
+# run the function prompt_command when building prompt
+PROMPT_COMMAND='prompt_command'
+
+# ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- #
