@@ -1,0 +1,17 @@
+#/usr/bin/env bash
+
+_npm_run_completions() {
+	if [ -f $(npm prefix)/package.json ]; then
+		
+		cur=${COMP_WORDS[COMP_CWORD]}
+		
+		opts=$(cat $(npm prefix)/package.json | \
+			awk '/scripts/{flag=1;next}/}/{flag=0}flag' | \
+			sed -n -e 's/.*"\([a-z|:]*\)":.*/\1/p' | tr '\n' ' ')
+
+		COMPREPLY=( $( compgen -W "$opts" -- $cur ) )
+	fi
+	return 0
+}
+
+complete -F _npm_run_completions npm run
