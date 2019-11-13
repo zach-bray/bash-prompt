@@ -1,5 +1,4 @@
 #/usr/bin/env bash
-
 _npm_run_completions() {
 	if [ -f $(npm prefix)/package.json ]; then
 		
@@ -13,5 +12,4 @@ _npm_run_completions() {
 	fi
 	return 0
 }
-
 complete -F _npm_run_completions npm run

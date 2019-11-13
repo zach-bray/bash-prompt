@@ -1,8 +1,3 @@
-#### ####
-# Author: Zach Bray
-# My bash prompt
-#### ####
-
 
 # function called every time the prompt needs to be rendered
 function prompt_command() {
@@ -107,4 +102,3 @@ function prompt_command() {
 # run the function prompt_command when building prompt
 PROMPT_COMMAND='prompt_command'
 
-# ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- #
