@@ -56,3 +56,5 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 # install other packages
 sudo apt install vim
 sudo apt install xsel
+sudo apt install gnome-tweaks
+sudo apt install indicator-multiload
