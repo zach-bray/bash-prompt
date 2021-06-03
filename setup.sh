@@ -18,13 +18,6 @@ echo "deb https://download.zulip.com/desktop/apt stable main" |     sudo tee /et
 sudo apt update
 sudo apt install zulip
 
-# install howdy (face rec)
-sudo add-apt-repository ppa:boltgolt/howdy
-sudo apt update
-sudo apt install howdy
-
-echo "[sudo howdy config] to config howdy"
-echo "[sudo howdy add] to add faces to account"
 
 # install vs code
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
